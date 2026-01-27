@@ -2,12 +2,17 @@ package org.example;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 // We're restricted to Romanian
 public class CarDetailsPage {
 
     private final WebDriver driver;
+    private final static String CAR_NAME_PATH = "//li[.//span[text()='Marcă']]//a";
+    private final static String MODEL_NAME_PATH = "//li[.//span[text()='Model']]//a";
+    private final static String GENERATION_PATH = "//li[.//span[text()='Generație']]//a";
+    private final static String YEAR_PATH = "//li[.//span[text()='An de fabricație']]//span[contains(@class,'value')]";
+    private final static String MILEAGE_PATH = "//li[.//span[text()='Rulaj']]//span[contains(@class,'value')]";
+    private final static String PRICE_PATH = "//div[@data-sentry-component='Price']//span[contains(@class,'main')]";
 
     public CarDetailsPage(WebDriver driver) {
         this.driver = driver;
@@ -26,37 +31,37 @@ public class CarDetailsPage {
 
     public String getName() {
         return getTextOrNull(
-                By.xpath("//li[.//span[text()='Marcă']]//a")
+                By.xpath(CAR_NAME_PATH)
         );
     }
 
     public String getModel() {
         return getTextOrNull(
-                By.xpath("//li[.//span[text()='Model']]//a")
+                By.xpath(MODEL_NAME_PATH)
         );
     }
 
     public String getGeneration() {
         return getTextOrNull(
-                By.xpath("//li[.//span[text()='Generație']]//a")
+                By.xpath(GENERATION_PATH)
         );
     }
 
     public String getYearText() {
         return getTextOrNull(
-                By.xpath("//li[.//span[text()='An de fabricație']]//span[contains(@class,'value')]")
+                By.xpath(YEAR_PATH)
         );
     }
 
     public String getMileageText() {
         return getTextOrNull(
-                By.xpath("//li[.//span[text()='Rulaj']]//span[contains(@class,'value')]")
+                By.xpath(MILEAGE_PATH)
         );
     }
 
     public String getPriceText() {
         return getTextOrNull(
-                By.xpath("//div[@data-sentry-component='Price']//span[contains(@class,'main')]")
+                By.xpath(PRICE_PATH)
         );
     }
 

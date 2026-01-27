@@ -4,14 +4,26 @@ import io.github.cdimascio.dotenv.Dotenv;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CarCsvProcessor {
+    private final Dotenv dotenv = Dotenv.load();
+    private final String ENV_CAR = "CAR";
+    private final String ENV_MODEL = "MODEL";
+    private final String ENV_GENERATION = "GENERATION";
+    private final String ENV_YEAR_MIN = "YEAR_MIN";
+    private final String ENV_YEAR_MAX = "YEAR_MAX";
+    private final String ENV_MIN_MILEAGE = "MIN_MILEAGE";
+    private final String ENV_MAX_MILEAGE = "MAX_MILEAGE";
+    private static final Logger logger = LoggerFactory.getLogger(CarCsvProcessor.class);
 
     public List<Car> readFile(String filename) throws IOException {
         Reader csv = new FileReader(filename);
@@ -23,49 +35,44 @@ public class CarCsvProcessor {
 
         List<Car> cars = new ArrayList<>();
         for (CSVRecord record : parser) {
-            Car car = new Car(
-                    record.get("URL"),
-                    record.get("Name"),
-                    record.get("Model"),
-                    record.get("Generation"),
-                    safeParseInt(record.get("Year")),
-                    safeParseInt(record.get("Mileage")),
-                    safeParseInt(record.get("Price"))
-            );
-
+            Car car = new Car(record);
             cars.add(car);
         }
 
         return cars;
     }
 
-    private Integer safeParseInt(String text) {
-        if (text == null || text.isBlank()) return null;
+
+    public static Integer safeParseInt(String text) {
+        if (text == null || text.isBlank()) {
+            logger.debug("safeParseInt: input is null or blank");
+            return null;
+        }
         try {
             return Integer.parseInt(text.replaceAll("[^0-9]", ""));
         } catch (NumberFormatException e) {
+            logger.warn("safeParseInt: failed to parse '{}' as integer", text);
             return null;
         }
     }
 
     public List<Car> filterCars(List<Car> carsToBeFiltered) {
-        Dotenv dotenv = Dotenv.load();
-        String name = dotenv.get("CAR");
-        String model = dotenv.get("MODEL");
-        String generation = dotenv.get("GENERATION");
-        int minYear = Integer.parseInt(dotenv.get("YEAR_MIN"));
-        int maxYear = Integer.parseInt(dotenv.get("YEAR_MAX"));
-        int minMileage = Integer.parseInt(dotenv.get("MIN_MILEAGE"));
-        int maxMileage = Integer.parseInt(dotenv.get("MAX_MILEAGE"));
+        String name = dotenv.get(ENV_CAR);
+        String model = dotenv.get(ENV_MODEL);
+        String generation = dotenv.get(ENV_GENERATION);
+        int minYear = Integer.parseInt(dotenv.get(ENV_YEAR_MIN));
+        int maxYear = Integer.parseInt(dotenv.get(ENV_YEAR_MAX));
+        int minMileage = Integer.parseInt(dotenv.get(ENV_MIN_MILEAGE));
+        int maxMileage = Integer.parseInt(dotenv.get(ENV_MAX_MILEAGE));
 
         return carsToBeFiltered
                 .stream()
                 .filter(car ->
-                        car.getName() != null && car.getName().equals(name) &&
-                                car.getModel() != null && car.getModel().equals(model) &&
-                                car.getGeneration() != null && car.getGeneration().equals(generation) &&
-                                car.getYear() != null && car.getYear() >= minYear && car.getYear() <= maxYear &&
-                                car.getMileage() != null && car.getMileage() >= minMileage && car.getMileage() <= maxMileage
+                        car.name() != null && car.name().equals(name) &&
+                                car.model() != null && car.model().equals(model) &&
+                                car.generation() != null && car.generation().equals(generation) &&
+                                car.year() != null && car.year() >= minYear && car.year() <= maxYear &&
+                                car.mileage() != null && car.mileage() >= minMileage && car.mileage() <= maxMileage
                 )
                 .toList();
     }

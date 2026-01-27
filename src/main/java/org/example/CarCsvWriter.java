@@ -15,13 +15,13 @@ public class CarCsvWriter {
             for (Car car : cars) {
                 writer.write(String.format(
                         "\"%s\",\"%s\",\"%s\",\"%s\",%s,%s,%s",
-                        car.getLink() != null ? car.getLink() : "",
-                        car.getName() != null ? car.getName() : "",
-                        car.getModel() != null ? car.getModel() : "",
-                        car.getGeneration() != null ? car.getGeneration() : "",
-                        car.getYear() != null ? car.getYear() : "",
-                        car.getMileage() != null ? car.getMileage() : "",
-                        car.getPrice() != null ? car.getPrice() : ""
+                        car.link() != null ? car.link() : "",
+                        car.name() != null ? car.name() : "",
+                        car.model() != null ? car.model() : "",
+                        car.generation() != null ? car.generation() : "",
+                        car.year() != null ? car.year() : "",
+                        car.mileage() != null ? car.mileage() : "",
+                        car.price() != null ? car.price() : ""
                 ));
                 writer.newLine();
             }

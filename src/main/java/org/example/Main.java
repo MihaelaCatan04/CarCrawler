@@ -1,9 +1,5 @@
 package org.example;
 
-import org.example.Car;
-import org.example.CarCsvWriter;
-import org.example.CarScrapingService;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -23,10 +19,10 @@ public class Main {
         CarStatisticsCalculator calculator = new CarStatisticsCalculator();
         CarStatistics stats = calculator.calculate(filteredCars);
 
-        System.out.println("Lowest price: " + stats.getLowestPrice() + "€");
-        System.out.println("Lowest link: " + stats.getLowestPriceLink());
-        System.out.println("Highest price: " + stats.getHighestPrice() + "€");
-        System.out.println("Highest link: " + stats.getHighestPriceLink());
-        System.out.println("Average price: " + stats.getAveragePrice() + "€");
+        System.out.println("Lowest price: " + stats.lowestPrice() + "€");
+        System.out.println("Lowest link: " + stats.lowestPriceLink());
+        System.out.println("Highest price: " + stats.highestPrice() + "€");
+        System.out.println("Highest link: " + stats.highestPriceLink());
+        System.out.println("Average price: " + stats.averagePrice() + "€");
     }
 }

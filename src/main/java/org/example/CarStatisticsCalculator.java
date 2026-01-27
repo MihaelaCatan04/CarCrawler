@@ -18,17 +18,17 @@ public class CarStatisticsCalculator {
         int count = 0;
 
         for (Car car : cars) {
-            Integer price = car.getPrice();
+            Integer price = car.price();
             if (price == null) continue;
 
             if (price < lowestPrice) {
                 lowestPrice = price;
-                lowestPriceLink = car.getLink();
+                lowestPriceLink = car.link();
             }
 
             if (price > highestPrice) {
                 highestPrice = price;
-                highestPriceLink = car.getLink();
+                highestPriceLink = car.link();
             }
 
             sum += price;

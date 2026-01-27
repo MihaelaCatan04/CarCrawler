@@ -1,11 +1,5 @@
 package org.example;
 
-import org.example.Car;
-import org.example.CarParser;
-import org.example.CarDetailsPage;
-import org.example.CarSearchPage;
-import org.example.DriverFactory;
-import org.example.SeleniumUtils;
 import org.openqa.selenium.WebDriver;
 
 import java.util.ArrayList;
