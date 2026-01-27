@@ -12,25 +12,29 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class CarCsvProcessor {
-    private final Dotenv dotenv = Dotenv.load();
-    private final String ENV_CAR = "CAR";
-    private final String ENV_MODEL = "MODEL";
-    private final String ENV_GENERATION = "GENERATION";
-    private final String ENV_YEAR_MIN = "YEAR_MIN";
-    private final String ENV_YEAR_MAX = "YEAR_MAX";
-    private final String ENV_MIN_MILEAGE = "MIN_MILEAGE";
-    private final String ENV_MAX_MILEAGE = "MAX_MILEAGE";
+    private static final Dotenv dotenv = Dotenv.load();
+    private static final String ENV_CAR = "CAR";
+    private static final String ENV_MODEL = "MODEL";
+    private static final String ENV_GENERATION = "GENERATION";
+    private static final String ENV_YEAR_MIN = "YEAR_MIN";
+    private static final String ENV_YEAR_MAX = "YEAR_MAX";
+    private static final String ENV_MIN_MILEAGE = "MIN_MILEAGE";
+    private static final String ENV_MAX_MILEAGE = "MAX_MILEAGE";
+    private static final String NOT_NUMBER_REGEX = "[^0-9]";
+    private static final String SPACE_REMOVER = "";
     private static final Logger logger = LoggerFactory.getLogger(CarCsvProcessor.class);
 
     public List<Car> readFile(String filename) throws IOException {
         Reader csv = new FileReader(filename);
 
         CSVParser parser = CSVFormat.DEFAULT
-                .withFirstRecordAsHeader()
-                .withTrim()
+                .builder()
+                .setHeader()
+                .setSkipHeaderRecord(true)
+                .setTrim(true)
+                .build()
                 .parse(csv);
 
         List<Car> cars = new ArrayList<>();
@@ -49,7 +53,7 @@ public class CarCsvProcessor {
             return null;
         }
         try {
-            return Integer.parseInt(text.replaceAll("[^0-9]", ""));
+            return Integer.parseInt(text.replaceAll(NOT_NUMBER_REGEX, SPACE_REMOVER));
         } catch (NumberFormatException e) {
             logger.warn("safeParseInt: failed to parse '{}' as integer", text);
             return null;

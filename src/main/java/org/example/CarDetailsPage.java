@@ -25,7 +25,7 @@ public class CarDetailsPage {
     private String getTextOrNull(By locator) {
         var elements = driver.findElements(locator);
         if (elements.isEmpty()) return null;
-        String text = elements.get(0).getText();
+        String text = elements.getFirst().getText();
         return text.isBlank() ? null : text;
     }
 

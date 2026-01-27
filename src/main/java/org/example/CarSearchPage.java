@@ -15,29 +15,33 @@ import java.util.List;
 public class CarSearchPage {
     private final WebDriver driver;
     private final WebDriverWait wait;
-    Dotenv dotenv = Dotenv.load();
+    private final static Dotenv dotenv = Dotenv.load();
     private final String car;
     private final String model;
     private final String generation;
-    private final String CAR_NAME_MENU_PATH = "//label[normalize-space()='";
-    private final String CATEGORIES_BUTTON_PATH = "button[data-testid='categories-toggle']";
-    private final String TRANSPORTATION_BUTTON_PATH = "li[data-url='transport']";
-    private final String CAR_CATEGORY_BUTTON = "a[data-subcategory='659']";
-    private final String SHOW_ALL_BUTTON = "button[data-testid='show_all_btn']";
-    private final String SKIP_BUTTON = "a.introjs-skipbutton";
-    private final String APPLY_FILTERS_BUTTON = "apply-filters-btn";
-    private final String CAR_LISTING_PATH = "div[data-sentry-component='AdList']";
-    private final String CAR_ELEMENT_PATH = "div.AdPhoto_wrapper__gAOIH a.AdPhoto_image__BMixw";
-    private final String HREF_ATTRIBUTE = "href";
-    private final String NEXT_BUTTON_PATH = "button.Pagination_pagination__container__buttons__wrapper__icon__next__A22Rc";
+    private final static String CAR_NAME_MENU_PATH = "//label[normalize-space()='";
+    private final static String CATEGORIES_BUTTON_PATH = "button[data-testid='categories-toggle']";
+    private final static String TRANSPORTATION_BUTTON_PATH = "li[data-url='transport']";
+    private final static String CAR_CATEGORY_BUTTON = "a[data-subcategory='659']";
+    private final static String SHOW_ALL_BUTTON = "button[data-testid='show_all_btn']";
+    private final static String SKIP_BUTTON = "a.introjs-skipbutton";
+    private final static String APPLY_FILTERS_BUTTON = "apply-filters-btn";
+    private final static String CAR_LISTING_PATH = "div[data-sentry-component='AdList']";
+    private final static String CAR_ELEMENT_PATH = "div.AdPhoto_wrapper__gAOIH a.AdPhoto_image__BMixw";
+    private final static String HREF_ATTRIBUTE = "href";
+    private final static String NEXT_BUTTON_PATH = "button.Pagination_pagination__container__buttons__wrapper__icon__next__A22Rc";
+    private final static int DURATION_SECONDS = 20;
+    private static final String ENV_CAR = "CAR";
+    private static final String ENV_MODEL = "MODEL";
+    private static final String ENV_GENERATION = "GENERATION";
 
 
     public CarSearchPage(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-        this.car = dotenv.get("CAR");
-        this.model = dotenv.get("MODEL");
-        this.generation = dotenv.get("GENERATION");
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(DURATION_SECONDS));
+        this.car = dotenv.get(ENV_CAR);
+        this.model = dotenv.get(ENV_MODEL);
+        this.generation = dotenv.get(ENV_GENERATION);
     }
 
     private void clickOptionByText(WebDriver driver, WebDriverWait wait, String text) {
@@ -95,13 +99,13 @@ public class CarSearchPage {
 
             List<WebElement> nextButtons = driver.findElements(By.cssSelector(NEXT_BUTTON_PATH));
 
-            if (nextButtons.isEmpty() || !nextButtons.get(0).isEnabled()) {
+            if (nextButtons.isEmpty() || !nextButtons.getFirst().isEnabled()) {
                 break;
             }
 
             // Click next and wait for the page to change
-            WebElement firstCar = carLinksElements.get(0); // store the first element to wait for staleness
-            WebElement next = wait.until(ExpectedConditions.elementToBeClickable(nextButtons.get(0)));
+            WebElement firstCar = carLinksElements.getFirst(); // store the first element to wait for staleness
+            WebElement next = wait.until(ExpectedConditions.elementToBeClickable(nextButtons.getFirst()));
             SeleniumUtils.safeClick(driver, next);
 
             // Wait until the first car becomes stale (page changed)
