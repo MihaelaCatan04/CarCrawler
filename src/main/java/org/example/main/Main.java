@@ -1,8 +1,14 @@
-package org.example;
+package org.example.main;
 
 import java.io.IOException;
 import java.util.List;
 
+import org.example.csv.CarCsvWriter;
+import org.example.model.Car;
+import org.example.model.CarStatistics;
+import org.example.parser.CarCsvProcessor;
+import org.example.scraper.CarScrapingService;
+import org.example.statistics.CarStatisticsCalculator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

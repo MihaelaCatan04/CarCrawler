@@ -1,4 +1,7 @@
-package org.example;
+package org.example.statistics;
+
+import org.example.model.Car;
+import org.example.model.CarStatistics;
 
 import java.util.List;
 

@@ -1,4 +1,7 @@
-package org.example;
+package org.example.parser;
+
+import org.example.scraper.CarDetailsPage;
+import org.example.model.Car;
 
 public class CarParser {
 

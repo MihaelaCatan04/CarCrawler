@@ -1,4 +1,6 @@
-package org.example;
+package org.example.csv;
+
+import org.example.model.Car;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

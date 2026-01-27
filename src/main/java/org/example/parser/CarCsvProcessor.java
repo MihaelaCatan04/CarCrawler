@@ -1,9 +1,10 @@
-package org.example;
+package org.example.parser;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.example.model.Car;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileReader;

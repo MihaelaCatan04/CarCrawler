@@ -1,5 +1,8 @@
-package org.example;
+package org.example.scraper;
 
+import org.example.utils.SeleniumUtils;
+import org.example.model.Car;
+import org.example.parser.CarParser;
 import org.openqa.selenium.WebDriver;
 
 import java.util.ArrayList;

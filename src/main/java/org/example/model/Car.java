@@ -1,6 +1,9 @@
-package org.example;
+package org.example.model;
 
 import org.apache.commons.csv.CSVRecord;
+import org.example.parser.CarCsvProcessor;
+import org.example.scraper.CarDetailsPage;
+import org.example.parser.CarParser;
 
 public record Car(String link, String name, String model, String generation,
                   Integer year, Integer mileage, Integer price) {

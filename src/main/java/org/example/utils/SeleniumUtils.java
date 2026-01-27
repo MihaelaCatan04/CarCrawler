@@ -1,4 +1,4 @@
-package org.example;
+package org.example.utils;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;

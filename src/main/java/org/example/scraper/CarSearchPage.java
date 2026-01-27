@@ -1,6 +1,7 @@
-package org.example;
+package org.example.scraper;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import org.example.utils.SeleniumUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
