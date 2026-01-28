@@ -19,7 +19,6 @@ public class CarStatisticsCalculator {
 
         int sum = 0;
         int count = 0;
-
         for (Car car : cars) {
             Integer price = car.price();
             if (price == null) continue;
