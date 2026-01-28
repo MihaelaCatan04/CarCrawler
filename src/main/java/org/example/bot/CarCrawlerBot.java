@@ -1,7 +1,11 @@
 package org.example.bot;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import org.apache.commons.lang3.time.StopWatch;
 import org.example.report.CarReportService;
+import org.example.scraper.CarDetailsPage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -15,6 +19,8 @@ public class CarCrawlerBot implements LongPollingSingleThreadUpdateConsumer {
     private static final Dotenv dotenv = Dotenv.load();
     private static final String BOT_TOKEN = dotenv.get("BOT_TOKEN");
     private final TelegramClient telegramClient;
+    private static final StopWatch watch = new StopWatch();
+    private final static Logger logger = LoggerFactory.getLogger(CarCrawlerBot.class);
 
     public CarCrawlerBot(TelegramClient telegramClient) {
         this.telegramClient = telegramClient;
@@ -37,7 +43,10 @@ public class CarCrawlerBot implements LongPollingSingleThreadUpdateConsumer {
             } else if (messageText.equals("/statistics")) {
                 try {
                     CarReportService reportService = new CarReportService();
+                    watch.start();
                     responseText = reportService.generateReport();
+                    watch.stop();
+                    logger.info("Time Elapsed: " + watch.getTime());
                 } catch (IOException e) {
                     e.printStackTrace();
                     responseText = "Error generating report!";
