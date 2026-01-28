@@ -33,7 +33,7 @@ MAX_MILEAGE=300000
 
 ### Running the Program
 
-he program will scrape car listings, save the data to `cars_data.csv`, filter cars according to the `.env` configuration, and print statistics:
+The program will scrape car listings, save the data to `cars_data.csv`, filter cars according to the `.env` configuration, and print statistics:
 
 ```
 Lowest price: 5000€
@@ -46,7 +46,7 @@ Average price: 12000€
 
 ### Elapsed Time
 For the default configuration, the elapsed time for scraping and filtering the cars is:
-![img.png](img.png)
+![img_1.png](img_1.png)
 
 ## Limitations
 

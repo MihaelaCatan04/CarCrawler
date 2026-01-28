@@ -47,6 +47,7 @@ public class CarCrawlerBot implements LongPollingSingleThreadUpdateConsumer {
                     responseText = reportService.generateReport();
                     watch.stop();
                     logger.info("Time Elapsed: " + watch.getTime());
+                    watch.reset();
                 } catch (IOException e) {
                     e.printStackTrace();
                     responseText = "Error generating report!";
