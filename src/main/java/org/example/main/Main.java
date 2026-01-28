@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 public class Main {
     private static final String URL = "https://999.md/ro";
-    private static final int MIN_CAR_NUMBER = 20;
+    private static final int MIN_CAR_NUMBER = 200;
     private static final String RESULT_CSV = "src/main/resources/cars_data.csv";
     private static final String LOWEST_PRICE = "Lowest price: ";
     private static final String EURO = "€";
