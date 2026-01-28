@@ -12,6 +12,9 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class CarSearchPage {
     private final WebDriver driver;
@@ -35,6 +38,7 @@ public class CarSearchPage {
     private static final String ENV_CAR = "CAR";
     private static final String ENV_MODEL = "MODEL";
     private static final String ENV_GENERATION = "GENERATION";
+    private static final Logger logger = LoggerFactory.getLogger(CarSearchPage.class);
 
 
     public CarSearchPage(WebDriver driver) {
@@ -63,6 +67,15 @@ public class CarSearchPage {
         SeleniumUtils.safeClick(driver, element);
     }
 
+    private void clickOptionByCSSIfExists(WebDriver driver, WebDriverWait wait, String cssSelector) {
+        try {
+            WebElement element = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(cssSelector)));
+            SeleniumUtils.safeClick(driver, element);
+        } catch (Exception e) {
+            logger.warn("Optional element not found or clickable: " + cssSelector);
+        }
+    }
+
     public void open(String link) {
         driver.get(link);
     }
@@ -75,7 +88,7 @@ public class CarSearchPage {
 
     public void applyFilters() {
         clickOptionByCSS(driver, wait, SHOW_ALL_BUTTON);
-        clickOptionByCSS(driver, wait, SKIP_BUTTON);
+        clickOptionByCSSIfExists(driver, wait, SKIP_BUTTON);
         clickOptionByText(driver, wait, car);
         clickOptionByText(driver, wait, model);
         clickOptionByText(driver, wait, generation);

@@ -12,14 +12,15 @@ import java.util.List;
 
 public class CarReportService {
     private static final String URL = "https://999.md/ro";
-    private static final int MIN_CAR_NUMBER = 200;
+    private static final int MIN_CAR_NUMBER = 100;
     private static final String RESULT_CSV = "src/main/resources/cars_data.csv";
 
     public String generateReport() throws IOException {
         CarScrapingService service = new CarScrapingService();
 
         List<String> links = service.collectCarLinks(URL);
-        List<Car> cars = service.scrapeCars(links.subList(0, Math.min(MIN_CAR_NUMBER, links.size())));
+        // List<Car> cars = service.scrapeCars(links.subList(0, Math.min(MIN_CAR_NUMBER, links.size())));
+        List<Car> cars = service.scrapeCars(links);
 
         new CarCsvWriter().write(cars, RESULT_CSV);
 
