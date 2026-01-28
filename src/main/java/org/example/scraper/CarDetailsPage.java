@@ -24,7 +24,7 @@ public class CarDetailsPage {
     private final static int TIMEOUT_DURATION = 30;
     private final static String USER_AGENT = "\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) \" +\n" +
             "                                \"AppleWebKit/537.36 (KHTML, like Gecko) \" +\n" +
-            "                                \"Chrome/121.0.0.0 Safari/537.36\""
+            "                                \"Chrome/121.0.0.0 Safari/537.36\"";
     private final HttpClient httpClient;
     private HttpResponse<String> response;
 
