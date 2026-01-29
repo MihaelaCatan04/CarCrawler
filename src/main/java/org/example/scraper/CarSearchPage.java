@@ -23,6 +23,12 @@ public class CarSearchPage {
     private final String car;
     private final String model;
     private final String generation;
+    private final String minYear;
+    private final String maxYear;
+    private final String minMileage;
+    private final String maxMileage;
+    private final static String MIN_PRICE_PATH = "input[value name='from_10000_1000000']";
+    private final static String MAX_PRICE_PATH = "input[value name='to_1000000_10000000']";
     private final static String CAR_NAME_MENU_PATH = "//label[normalize-space()='";
     private final static String CATEGORIES_BUTTON_PATH = "button[data-testid='categories-toggle']";
     private final static String TRANSPORTATION_BUTTON_PATH = "li[data-url='transport']";
@@ -39,14 +45,25 @@ public class CarSearchPage {
     private static final String ENV_MODEL = "MODEL";
     private static final String ENV_GENERATION = "GENERATION";
     private static final Logger logger = LoggerFactory.getLogger(CarSearchPage.class);
-
-
+    private final static String MIN_YEAR_PATH = "input[name='from_7_19']";
+    private final static String MAX_YEAR_PATH = "input[name='to_7_19']";
+    private final static String MILEAGE_PATH = "button[data-testid='filter_type_range_1081']";
+    private final static String MIN_MILEAGE_PATH = "input[name='from_1081_104']";
+    private final static String MAX_MILEAGE_PATH = "input[name='to_1081_104']";
+    private final static String ENV_MIN_YEAR = "YEAR_MIN";
+    private final static String ENV_MAX_YEAR = "YEAR_MAX";
+    private final static String ENV_MIN_MILEAGE = "MIN_MILEAGE";
+    private final static String ENV_MAX_MILEAGE = "MAX_MILEAGE";
     public CarSearchPage(WebDriver driver) {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(DURATION_SECONDS));
         this.car = dotenv.get(ENV_CAR);
         this.model = dotenv.get(ENV_MODEL);
         this.generation = dotenv.get(ENV_GENERATION);
+        this.minYear = dotenv.get(ENV_MIN_YEAR);
+        this.maxYear = dotenv.get(ENV_MAX_YEAR);
+        this.minMileage = dotenv.get(ENV_MIN_MILEAGE);
+        this.maxMileage = dotenv.get(ENV_MAX_MILEAGE);
     }
 
     private void clickOptionByText(WebDriver driver, WebDriverWait wait, String text) {
@@ -69,10 +86,26 @@ public class CarSearchPage {
 
     private void clickOptionByCSSIfExists(WebDriver driver, WebDriverWait wait, String cssSelector) {
         try {
-            WebElement element = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(cssSelector)));
+            WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(cssSelector)));
             SeleniumUtils.safeClick(driver, element);
         } catch (Exception e) {
             logger.warn("Optional element not found or clickable: " + cssSelector);
+        }
+    }
+
+
+    private void enterOptionByCSS(WebDriver driver, WebDriverWait wait, String css, String value) {
+        try {
+            By locator = By.cssSelector(css);
+
+            WebElement element = wait.until(
+                    ExpectedConditions.presenceOfElementLocated(locator)
+            );
+
+            SeleniumUtils.safeSendKeys(driver, element, value);
+
+        } catch (Exception e) {
+            logger.error("Failed to enter value for input: " + css, e);
         }
     }
 
@@ -92,10 +125,23 @@ public class CarSearchPage {
         clickOptionByText(driver, wait, car);
         clickOptionByText(driver, wait, model);
         clickOptionByText(driver, wait, generation);
-        clickOptionById(driver, wait, APPLY_FILTERS_BUTTON);
-    }
+        enterOptionByCSS(driver, wait, MIN_YEAR_PATH, minYear);
+        enterOptionByCSS(driver, wait, MAX_YEAR_PATH, maxYear);
+        clickOptionByCSS(driver, wait, MILEAGE_PATH);
 
-    public List<String> collectCarLinks() {
+        wait.until(d -> {
+            WebElement min = d.findElement(By.cssSelector(MIN_MILEAGE_PATH));
+            WebElement max = d.findElement(By.cssSelector(MAX_MILEAGE_PATH));
+            return min.isDisplayed() && min.getSize().getHeight() > 0 &&
+                    max.isDisplayed() && max.getSize().getHeight() > 0;
+        });
+
+        enterOptionByCSS(driver, wait, MIN_MILEAGE_PATH, minMileage);
+        enterOptionByCSS(driver, wait, MAX_MILEAGE_PATH, maxMileage);
+        clickOptionById(driver, wait, APPLY_FILTERS_BUTTON);
+
+    }
+        public List<String> collectCarLinks() {
         List<String> carLinks = new ArrayList<>();
 
         while (true) {
