@@ -1,15 +1,17 @@
 package org.example.main;
 
 import org.example.bot.CarCrawlerBot;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 public class Main {
-    public static void main(String[] args) {
+    static void main(String[] args) throws IOException, InterruptedException {
         Logger logger = LoggerFactory.getLogger(Main.class);
         try {
             String botToken = CarCrawlerBot.getBotToken();

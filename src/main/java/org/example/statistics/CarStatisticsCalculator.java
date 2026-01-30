@@ -1,18 +1,31 @@
 package org.example.statistics;
 
-import org.example.model.Car;
+//import org.example.model.Car;
+
+import org.example.model.Advert;
 import org.example.model.CarStatistics;
 
 import java.util.List;
+import java.util.Objects;
 
 public class CarStatisticsCalculator {
+    private static final String URL = "https://999.md/";
     private int lowestPrice = Integer.MAX_VALUE;
     private int highestPrice = 0;
     private int averagePrice = 0;
     private String lowestPriceLink;
     private String highestPriceLink;
 
-    public CarStatistics calculate(List<Car> cars) {
+    private int convertPrice(int price, String priceMeasurement) {
+        if (priceMeasurement.equals("UNIT_MDL")) {
+            price = (int) Math.round(price * 0.05);
+        } else if (priceMeasurement.equals("UNIT_USD")) {
+            price = (int) Math.round(price * 0.85);
+        }
+        return price;
+    }
+
+    public CarStatistics calculate(List<Advert> cars) {
         if (cars == null || cars.isEmpty()) {
             return new CarStatistics(0, null, 0, null, 0);
         }
@@ -20,18 +33,22 @@ public class CarStatisticsCalculator {
         int sum = 0;
         int count = 0;
 
-        for (Car car : cars) {
-            Integer price = car.price();
-            if (price == null) continue;
+        for (Advert car : cars) {
+            int price = car.price().value().value();
+            String priceMeasurement = car.price().value().unit();
+
+            if (!Objects.equals(priceMeasurement, "UNIT_EUR")) {
+                price = convertPrice(price, priceMeasurement);
+            }
 
             if (price < lowestPrice) {
                 lowestPrice = price;
-                lowestPriceLink = car.link();
+                lowestPriceLink = URL + car.id();
             }
 
             if (price > highestPrice) {
                 highestPrice = price;
-                highestPriceLink = car.link();
+                highestPriceLink = URL + car.id();
             }
 
             sum += price;
