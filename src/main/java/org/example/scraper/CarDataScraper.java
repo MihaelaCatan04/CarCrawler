@@ -56,7 +56,6 @@ public class CarDataScraper {
             );
 
             int count = brandContainers.count();
-            log.info("Found {} brands", count);
 
             for (int i = 0; i < count; i++) {
                 Locator container = brandContainers.nth(i);
@@ -68,7 +67,6 @@ public class CarDataScraper {
 
                 brands.add(new CarBrand(name, id));
 
-                log.info("Brand: {} ({})", name, id);
             }
 
             browser.close();

@@ -29,7 +29,6 @@ public class Main {
             CarCrawlerBot bot = new CarCrawlerBot(flowHandler);
             botsApplication.registerBot(botToken, bot);
 
-            System.out.println("CarCrawlerBot successfully started!");
             Thread.currentThread().join();
 
         } catch (Exception e) {
