@@ -1,18 +1,12 @@
-package org.example.scraper;
+package org.example.request;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.request.GraphQLRequest;
+import org.example.bot.UserSession;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.util.List;
+import java.util.Map;
 
-public class SearchService {
-    private static final String GRAPHQL_ENDPOINT = "https://999.md/graphql";
+public class SearchRequestEditorService {
+
     private static final String QUERY = """
             query SearchAds($input: Ads_SearchInput!, $isWorkCategory: Boolean = false, $includeCarsFeatures: Boolean = false, $includeBody: Boolean = false, $includeOwner: Boolean = false, $includeBoost: Boolean = false, $locale: Common_Locale) {
               searchAds(input: $input) {
@@ -260,96 +254,74 @@ public class SearchService {
               __typename
             }
             """;
-    private static final String PARAMETERS = """
-            {
-              "isWorkCategory": false,
-              "includeCarsFeatures": true,
-              "includeBody": false,
-              "includeOwner": true,
-              "includeBoost": false,
-              "input": {
-                "subCategoryId": 659,
-                "source": "AD_SOURCE_DESKTOP",
-                "filters": [
-                  {
-                    "filterId": 16,
-                    "features": [
-                      {
-                        "featureId": 1,
-                        "optionIds": [
-                          776
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "filterId": 1,
-                    "features": [
-                      {
-                        "featureId": 2095,
-                        "optionIds": [
-                          36188
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "filterId": 7,
-                    "features": [
-                      {
-                        "featureId": 19,
-                        "range": {
-                          "max": 2016,
-                          "min": 2015
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "filterId": 1081,
-                    "features": [
-                      {
-                        "featureId": 104,
-                        "range": {
-                          "max": 300000,
-                          "min": 200000
-                        },
-                        "unit": "UNIT_KILOMETER"
-                      }
-                    ]
-                  }
-                ],
-                "pagination": {
-                  "limit": 78,
-                  "skip": 0
-                }
-              },
-              "locale": "ro_RO"
-            }
-            """;
 
-    private String returnRequestBody(String query, String parameters) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode variables = mapper.readTree(parameters);
-        GraphQLRequest body = new GraphQLRequest(query, variables);
-        return mapper.writeValueAsString(body);
+    private Map<String, Object> modifyVariables(UserSession s) {
+
+        return Map.of(
+                "isWorkCategory", false,
+                "includeCarsFeatures", true,
+                "includeBody", false,
+                "includeOwner", true,
+                "includeBoost", false,
+                "locale", "ro_RO",
+                "input", Map.of(
+                        "subCategoryId", 659,
+                        "source", "AD_SOURCE_DESKTOP",
+                        "pagination", Map.of(
+                                "limit", 78,
+                                "skip", 0
+                        ),
+                        "filters", List.of(
+                                Map.of(
+                                        "filterId", 16,
+                                        "features", List.of(
+                                                Map.of(
+                                                        "featureId", 1,
+                                                        "optionIds", List.of(776)
+                                                )
+                                        )
+                                ),
+                                Map.of(
+                                        "filterId", 1,
+                                        "features", List.of(
+                                                Map.of(
+                                                        "featureId", 2095,
+                                                        "optionIds", List.of(s.generationId)
+                                                )
+                                        )
+                                ),
+                                Map.of(
+                                        "filterId", 7,
+                                        "features", List.of(
+                                                Map.of(
+                                                        "featureId", 19,
+                                                        "range", Map.of(
+                                                                "min", s.minYear,
+                                                                "max", s.maxYear
+                                                        )
+                                                )
+                                        )
+                                ),
+                                Map.of(
+                                        "filterId", 1081,
+                                        "features", List.of(
+                                                Map.of(
+                                                        "featureId", 104,
+                                                        "range", Map.of(
+                                                                "min", s.minMileage,
+                                                                "max", s.maxMileage
+                                                        ),
+                                                        "unit", "UNIT_KILOMETER"
+                                                )
+                                        )
+                                )
+                        )
+                )
+        );
     }
 
-
-    public String search() throws IOException, InterruptedException {
-        String requestBody = returnRequestBody(QUERY, PARAMETERS);
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(GRAPHQL_ENDPOINT))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                .build();
-
-        HttpClient client = HttpClient.newHttpClient();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        return response.body();
+    public GraphQLRequest returnRequestBody(UserSession userSession) {
+        return new GraphQLRequest(QUERY, modifyVariables(userSession));
     }
-
 
 }

@@ -1,9 +1,7 @@
 package org.example.statistics;
 
-//import org.example.model.Car;
-
-import org.example.model.Advert;
-import org.example.model.CarStatistics;
+import org.example.car_model.Advert;
+import org.example.car_model.CarStatistics;
 
 import java.util.List;
 import java.util.Objects;
@@ -15,11 +13,14 @@ public class CarStatisticsCalculator {
     private int averagePrice = 0;
     private String lowestPriceLink;
     private String highestPriceLink;
+    private static final String UNIT_MDL = "UNIT_MDL";
+    private static final String UNIT_EUR = "UNIT_EUR";
+    private static final String UNIT_USD = "UNIT_USD";
 
     private int convertPrice(int price, String priceMeasurement) {
-        if (priceMeasurement.equals("UNIT_MDL")) {
+        if (priceMeasurement.equals(UNIT_MDL)) {
             price = (int) Math.round(price * 0.05);
-        } else if (priceMeasurement.equals("UNIT_USD")) {
+        } else if (priceMeasurement.equals(UNIT_USD)) {
             price = (int) Math.round(price * 0.85);
         }
         return price;
@@ -37,7 +38,7 @@ public class CarStatisticsCalculator {
             int price = car.price().value().value();
             String priceMeasurement = car.price().value().unit();
 
-            if (!Objects.equals(priceMeasurement, "UNIT_EUR")) {
+            if (!Objects.equals(priceMeasurement, UNIT_EUR)) {
                 price = convertPrice(price, priceMeasurement);
             }
 

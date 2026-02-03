@@ -2,8 +2,8 @@ package org.example.parser;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.model.Advert;
-import org.example.model.Root;
+import org.example.car_model.Advert;
+import org.example.car_model.Root;
 
 import java.util.ArrayList;
 import java.util.List;

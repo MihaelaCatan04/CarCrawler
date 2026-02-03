@@ -1,6 +1,6 @@
 package org.example.report;
 
-import org.example.model.CarStatistics;
+import org.example.car_model.CarStatistics;
 
 public class CarReportService {
     public static String generateReport(CarStatistics stats) {

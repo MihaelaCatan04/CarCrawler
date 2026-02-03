@@ -1,4 +1,4 @@
-package org.example.model;
+package org.example.car_model;
 
 public record OptionValue(
         Abbreviations abbreviations,
