@@ -1,96 +1,157 @@
 package org.example.scraper;
 
-import com.microsoft.playwright.*;
-import com.microsoft.playwright.options.LoadState;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CarDataScraper {
 
     private static final Logger log = LoggerFactory.getLogger(CarDataScraper.class);
 
-    private static final String URL = "https://999.md/ro/list/transport/cars";
-    private static final String SHOW_ALL_BTN = "button[data-testid='show_all_btn']";
-    private static final String POPUP_CLOSE = "a.introjs-skipbutton";
+    private static final String URL = "https://999.md/ro/list/transport/cars?_rsc=r2aah";
+    private static final String HEADER_ACCEPT = "Accept";
+    private static final String HEADER_ACCEPT_VALUE = "text/x-component";
+    private static final String HEADER_USER_AGENT = "User-Agent";
+    private static final String USER_AGENT_VALUE = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0";
 
-    private static final String BRAND_INPUT = "input[data-testid$='level1']";
-    private static final String ITEM_CONTAINER = "div.styles_checkbox__ONbig";
+    private static final String PAYLOAD_RECONSTRUCTOR = "self\\.__next_f\\.push\\(\\[\\d+,\"(.*?)\"\\]\\)";
+    private static final String NAME_FILTER = "\"id\":1,\"type\":\"FILTER_TYPE_OPTIONS\"";
 
-    private static final String BRAND_SECTION = "div.styles_expanded__T0p0R";
-
-    private static final String FILTER_BUTTON = "button[data-testid='filter_type_options_1']";
+    private static final String JSON_FEATURES = "features";
+    private static final String JSON_OPTIONS = "options";
+    private static final String JSON_PRESENT_DYNAMIC = "presentInDynamicFilters";
+    private static final String JSON_ID = "id";
+    private static final String JSON_TITLE = "title";
+    private static final String JSON_TRANSLATED = "translated";
 
     public static List<CarBrand> scrapeBrands() {
-
         List<CarBrand> brands = new ArrayList<>();
 
-        try (Playwright playwright = Playwright.create()) {
+        try {
+            HttpClient client = HttpClient.newBuilder()
+                    .followRedirects(HttpClient.Redirect.NORMAL)
+                    .build();
 
-            Browser browser = playwright.chromium().launch(
-                    new BrowserType.LaunchOptions()
-                            .setHeadless(true)
-                            .setSlowMo(50)
-            );
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(URL))
+                    .header(HEADER_ACCEPT, HEADER_ACCEPT_VALUE)
+                    .header(HEADER_USER_AGENT, USER_AGENT_VALUE)
+                    .GET()
+                    .build();
 
-            Page page = browser.newPage();
-            page.navigate(URL);
-            page.waitForLoadState(LoadState.NETWORKIDLE);
+            HttpResponse<String> response =
+                    client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            clickIfExists(page, SHOW_ALL_BTN);
-            clickIfExists(page, POPUP_CLOSE);
+            String body = response.body();
 
-            Locator brandSection = page.locator(BRAND_SECTION)
-                    .filter(new Locator.FilterOptions()
-                            .setHas(page.locator(FILTER_BUTTON)));
+            String fullData = reconstructPayload(body);
+            String brandFilterJson = isolateMarcaFilter(fullData);
 
-            if (brandSection.count() == 0) {
-                log.error("Could not find the Brand (Marcă) section!");
-                return brands;
+            if (brandFilterJson != null) {
+                brands = parseVisibleBrands(brandFilterJson);
             }
 
-            Locator brandContainers = brandSection.locator(ITEM_CONTAINER).filter(
-                    new Locator.FilterOptions().setHas(page.locator(BRAND_INPUT))
-            );
+            log.info("Successfully scraped {} visible brands.", brands.size());
 
-            int count = brandContainers.count();
-
-            for (int i = 0; i < count; i++) {
-                Locator container = brandContainers.nth(i);
-
-                String idStr = container.locator(BRAND_INPUT).first().getAttribute("value");
-                String name = container.locator("label").first().textContent().trim();
-
-                int id = parseId(idStr);
-
-                brands.add(new CarBrand(name, id));
-
-            }
-
-            browser.close();
-
-        } catch (Exception e) {
+        } catch (IOException | InterruptedException e) {
             log.error("Scraping failed", e);
+            Thread.currentThread().interrupt();
         }
 
         return brands;
     }
 
-    private static int parseId(String idStr) {
-        try {
-            return Integer.parseInt(idStr);
-        } catch (Exception e) {
-            return -1;
+    private static String reconstructPayload(String body) {
+        StringBuilder sb = new StringBuilder();
+        Pattern p = Pattern.compile(PAYLOAD_RECONSTRUCTOR);
+        Matcher m = p.matcher(body);
+
+        while (m.find()) {
+            String chunk = m.group(1)
+                    .replace("\\\"", "\"")
+                    .replace("\\\\", "\\");
+            sb.append(chunk);
         }
+        return sb.toString();
     }
 
-    private static void clickIfExists(Page page, String selector) {
-        Locator loc = page.locator(selector);
-        if (loc.count() > 0 && loc.first().isVisible()) {
-            loc.first().click();
-            page.waitForTimeout(500);
+    private static String isolateMarcaFilter(String payload) {
+        int index = payload.indexOf(NAME_FILTER);
+        if (index == -1) return null;
+
+        int startPos = payload.lastIndexOf("{", index);
+        int braceCount = 0;
+        boolean inString = false;
+
+        for (int i = startPos; i < payload.length(); i++) {
+            char c = payload.charAt(i);
+
+            if (c == '"' && (i == 0 || payload.charAt(i - 1) != '\\')) {
+                inString = !inString;
+            }
+
+            if (!inString) {
+                if (c == '{') braceCount++;
+                else if (c == '}') {
+                    braceCount--;
+                    if (braceCount == 0) {
+                        return payload.substring(startPos, i + 1);
+                    }
+                }
+            }
         }
+        return null;
+    }
+
+    private static List<CarBrand> parseVisibleBrands(String json) {
+        List<CarBrand> list = new ArrayList<>();
+
+        try {
+            JsonObject filterObj = JsonParser.parseString(json).getAsJsonObject();
+            JsonArray features = filterObj.getAsJsonArray(JSON_FEATURES);
+
+            if (features != null && features.size() > 0) {
+                JsonArray options = features.get(0)
+                        .getAsJsonObject()
+                        .getAsJsonArray(JSON_OPTIONS);
+
+                if (options != null) {
+                    for (JsonElement el : options) {
+                        JsonObject opt = el.getAsJsonObject();
+
+                        boolean isVisible =
+                                opt.get(JSON_PRESENT_DYNAMIC).getAsBoolean();
+
+                        if (isVisible) {
+                            int id = opt.get(JSON_ID).getAsInt();
+
+                            String name = opt
+                                    .getAsJsonObject(JSON_TITLE)
+                                    .get(JSON_TRANSLATED)
+                                    .getAsString();
+
+                            list.add(new CarBrand(name, id));
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error parsing visible brands: {}", e.getMessage());
+        }
+
+        return list;
     }
 }
