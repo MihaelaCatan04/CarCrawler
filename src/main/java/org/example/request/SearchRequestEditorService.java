@@ -3,7 +3,6 @@ package org.example.request;
 import org.example.bot.UserSession;
 
 import java.util.List;
-import java.util.Map;
 
 public class SearchRequestEditorService {
 
@@ -255,73 +254,36 @@ public class SearchRequestEditorService {
             }
             """;
 
-    private Map<String, Object> modifyVariables(UserSession s) {
-
-        return Map.of(
-                "isWorkCategory", false,
-                "includeCarsFeatures", true,
-                "includeBody", false,
-                "includeOwner", true,
-                "includeBoost", false,
-                "locale", "ro_RO",
-                "input", Map.of(
-                        "subCategoryId", 659,
-                        "source", "AD_SOURCE_DESKTOP",
-                        "pagination", Map.of(
-                                "limit", 78,
-                                "skip", 0
-                        ),
-                        "filters", List.of(
-                                Map.of(
-                                        "filterId", 16,
-                                        "features", List.of(
-                                                Map.of(
-                                                        "featureId", 1,
-                                                        "optionIds", List.of(776)
-                                                )
-                                        )
-                                ),
-                                Map.of(
-                                        "filterId", 1,
-                                        "features", List.of(
-                                                Map.of(
-                                                        "featureId", 2095,
-                                                        "optionIds", List.of(s.generationId)
-                                                )
-                                        )
-                                ),
-                                Map.of(
-                                        "filterId", 7,
-                                        "features", List.of(
-                                                Map.of(
-                                                        "featureId", 19,
-                                                        "range", Map.of(
-                                                                "min", s.minYear,
-                                                                "max", s.maxYear
-                                                        )
-                                                )
-                                        )
-                                ),
-                                Map.of(
-                                        "filterId", 1081,
-                                        "features", List.of(
-                                                Map.of(
-                                                        "featureId", 104,
-                                                        "range", Map.of(
-                                                                "min", s.minMileage,
-                                                                "max", s.maxMileage
-                                                        ),
-                                                        "unit", "UNIT_KILOMETER"
-                                                )
-                                        )
-                                )
-                        )
-                )
+    private SearchAdsVariables modifyVariables(UserSession s) {
+        SearchPagination pagination = new SearchPagination(78, 0);
+        
+        SearchFilter locationFilter = new SearchFilter(16, List.of(
+                SearchFeature.withOptionIds(1, List.of(776))
+        ));
+        
+        SearchFilter generationFilter = new SearchFilter(1, List.of(
+                SearchFeature.withOptionIds(2095, List.of(s.generationId))
+        ));
+        
+        SearchFilter yearFilter = new SearchFilter(7, List.of(
+                SearchFeature.withRange(19, new SearchRange(s.minYear, s.maxYear))
+        ));
+        
+        SearchFilter mileageFilter = new SearchFilter(1081, List.of(
+                SearchFeature.withRangeAndUnit(104, new SearchRange(s.minMileage, s.maxMileage), "UNIT_KILOMETER")
+        ));
+        
+        AdsSearchInput input = new AdsSearchInput(
+                659,
+                "AD_SOURCE_DESKTOP",
+                pagination,
+                List.of(locationFilter, generationFilter, yearFilter, mileageFilter)
         );
+        
+        return new SearchAdsVariables(false, true, false, true, false, "ro_RO", input);
     }
 
     public GraphQLRequest returnRequestBody(UserSession userSession) {
-        return new GraphQLRequest(QUERY, modifyVariables(userSession));
+        return new GraphQLRequest(QUERY, modifyVariables(userSession).toMap());
     }
-
 }

@@ -1,7 +1,5 @@
 package org.example.request;
 
-import java.util.Map;
-
 public class CarOptionsRequestEditorService {
 
     private static final String QUERY = """
@@ -26,15 +24,9 @@ public class CarOptionsRequestEditorService {
             }
             """;
 
-    private Map<String, Object> modifyVariables(int brandId) {
-
-        return Map.of(
-                "input", Map.of(
-                        "categoryId", 659,
-                        "id", 21,
-                        "parentId", brandId
-                )
-        );
+    private FeatureRequestVariables modifyVariables(int brandId) {
+        FeatureRequestInput input = new FeatureRequestInput(659, 21, brandId);
+        return new FeatureRequestVariables(input);
     }
 
     public GraphQLRequest returnRequestBody(int brandId) {
