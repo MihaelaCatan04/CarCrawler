@@ -1,5 +1,7 @@
 package org.example.car_model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public record Account(
         String id,
         String login,
@@ -7,6 +9,7 @@ public record Account(
         String createdDate,
         Business business,
         Verification verification,
-        String __typename
+        @JsonProperty("__typename")
+        String typeName
 ) {
 }

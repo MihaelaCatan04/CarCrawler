@@ -1,7 +1,10 @@
 package org.example.car_model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public record I18NTr(
         String translated,
-        String __typename
+        @JsonProperty("__typename")
+        String typeName
 ) {
 }

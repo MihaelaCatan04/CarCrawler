@@ -8,49 +8,29 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 public class KeyboardFactory {
 
     public InlineKeyboardMarkup brands() {
-        List<InlineKeyboardRow> rows = new ArrayList<>();
         List<CarBrand> carNames = CarDataScraper.scrapeBrands();
-
-        for (CarBrand car : carNames) {
-            rows.add(new InlineKeyboardRow(
-                    InlineKeyboardButton.builder()
-                            .text(car.name())
-                            .callbackData("BRAND|" + car.id())
-                            .build()
-            ));
-        }
-        return new InlineKeyboardMarkup(rows);
+        return new InlineKeyboardMarkup(RowsTemplate(carNames, CarBrand::getName, car -> "BRAND|" + car.getId()));
     }
 
     public InlineKeyboardMarkup models(List<ModelOption> models) {
-        List<InlineKeyboardRow> rows = new ArrayList<>();
-
-        for (ModelOption model : models) {
-            rows.add(new InlineKeyboardRow(
-                    InlineKeyboardButton.builder()
-                            .text(model.title)
-                            .callbackData("MODEL|" + model.id)
-                            .build()
-            ));
-        }
-        return new InlineKeyboardMarkup(rows);
+        return new InlineKeyboardMarkup(RowsTemplate(models, ModelOption::getTitle, model -> "MODEL|" + model.getId()));
     }
 
     public InlineKeyboardMarkup generations(List<GenerationOption> generations) {
-        List<InlineKeyboardRow> rows = new ArrayList<>();
+        return new InlineKeyboardMarkup(RowsTemplate(generations, GenerationOption::getTitle, gen -> "GEN|" + gen.getId()));
+    }
 
-        for (GenerationOption gen : generations) {
-            rows.add(new InlineKeyboardRow(
-                    InlineKeyboardButton.builder()
-                            .text(gen.title)
-                            .callbackData("GEN|" + gen.id)
-                            .build()
-            ));
+    private <T> List<InlineKeyboardRow> RowsTemplate(List<T> items, Function<T, String> textMapper, Function<T, String> callbackMapper) {
+
+        List<InlineKeyboardRow> rows = new ArrayList<>();
+        for (T item : items) {
+            rows.add(new InlineKeyboardRow(InlineKeyboardButton.builder().text(textMapper.apply(item)).callbackData(callbackMapper.apply(item)).build()));
         }
-        return new InlineKeyboardMarkup(rows);
+        return rows;
     }
 }

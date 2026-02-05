@@ -1,19 +1,12 @@
 package org.example.scraper;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
+import org.example.http.HttpService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,10 +18,13 @@ public class CarDataScraper {
     private static final String HEADER_ACCEPT = "Accept";
     private static final String HEADER_ACCEPT_VALUE = "text/x-component";
     private static final String HEADER_USER_AGENT = "User-Agent";
-    private static final String USER_AGENT_VALUE = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0";
+    private static final String USER_AGENT_VALUE =
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0";
 
-    private static final String PAYLOAD_RECONSTRUCTOR = "self\\.__next_f\\.push\\(\\[\\d+,\"(.*?)\"\\]\\)";
-    private static final String NAME_FILTER = "\"id\":1,\"type\":\"FILTER_TYPE_OPTIONS\"";
+    private static final String PAYLOAD_RECONSTRUCTOR =
+            "self\\.__next_f\\.push\\(\\[\\d+,\"(.*?)\"\\]\\)";
+    private static final String NAME_FILTER =
+            "\"id\":1,\"type\":\"FILTER_TYPE_OPTIONS\"";
 
     private static final String JSON_FEATURES = "features";
     private static final String JSON_OPTIONS = "options";
@@ -37,25 +33,18 @@ public class CarDataScraper {
     private static final String JSON_TITLE = "title";
     private static final String JSON_TRANSLATED = "translated";
 
+    private static final HttpService httpService = new HttpService();
+
     public static List<CarBrand> scrapeBrands() {
+
         List<CarBrand> brands = new ArrayList<>();
 
         try {
-            HttpClient client = HttpClient.newBuilder()
-                    .followRedirects(HttpClient.Redirect.NORMAL)
-                    .build();
+            Map<String, String> headers = new HashMap<>();
+            headers.put(HEADER_ACCEPT, HEADER_ACCEPT_VALUE);
+            headers.put(HEADER_USER_AGENT, USER_AGENT_VALUE);
 
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(URL))
-                    .header(HEADER_ACCEPT, HEADER_ACCEPT_VALUE)
-                    .header(HEADER_USER_AGENT, USER_AGENT_VALUE)
-                    .GET()
-                    .build();
-
-            HttpResponse<String> response =
-                    client.send(request, HttpResponse.BodyHandlers.ofString());
-
-            String body = response.body();
+            String body = httpService.get(URL, headers);
 
             String fullData = reconstructPayload(body);
             String brandFilterJson = isolateMarcaFilter(fullData);
@@ -117,13 +106,15 @@ public class CarDataScraper {
     }
 
     private static List<CarBrand> parseVisibleBrands(String json) {
+
         List<CarBrand> list = new ArrayList<>();
 
         try {
             JsonObject filterObj = JsonParser.parseString(json).getAsJsonObject();
             JsonArray features = filterObj.getAsJsonArray(JSON_FEATURES);
 
-            if (features != null && features.size() > 0) {
+            if (features != null && !features.isEmpty()) {
+
                 JsonArray options = features.get(0)
                         .getAsJsonObject()
                         .getAsJsonArray(JSON_OPTIONS);

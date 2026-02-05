@@ -7,6 +7,6 @@ public class SessionService {
     private final Map<Long, UserSession> sessions = new HashMap<>();
 
     public UserSession get(long chatId) {
-        return sessions.computeIfAbsent(chatId, id -> new UserSession());
+        return sessions.computeIfAbsent(chatId, _ -> new UserSession());
     }
 }

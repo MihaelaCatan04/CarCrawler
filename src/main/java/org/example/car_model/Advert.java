@@ -1,5 +1,7 @@
 package org.example.car_model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 public record Advert(
@@ -31,6 +33,7 @@ public record Advert(
         Object animationAndFrame,
 
         String reseted,
-        String __typename
+        @JsonProperty("__typename")
+        String typeName
 ) {
 }

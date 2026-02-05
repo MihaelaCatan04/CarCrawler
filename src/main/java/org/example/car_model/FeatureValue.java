@@ -1,9 +1,12 @@
 package org.example.car_model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public record FeatureValue<T>(
         int id,
         String type,
         T value,
-        String __typename
+        @JsonProperty("__typename")
+        String typeName
 ) {
 }

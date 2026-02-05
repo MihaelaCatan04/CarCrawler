@@ -1,15 +1,24 @@
 package org.example.bot;
 
-public class CallbackData {
-    public String action;
-    public String[] args;
 
-    public static CallbackData parse(String raw) {
-        String[] parts = raw.split("\\|");
-        CallbackData data = new CallbackData();
-        data.action = parts[0];
-        data.args = new String[parts.length - 1];
-        System.arraycopy(parts, 1, data.args, 0, parts.length - 1);
-        return data;
+import java.util.Arrays;
+import java.util.List;
+
+public class CallbackData {
+    private final Update action;
+    private final List<String> args;
+
+    public CallbackData(String raw) {
+        List<String> parts = Arrays.asList(raw.split("\\|"));
+        this.action = Update.valueOf(parts.getFirst());
+        this.args = parts.subList(1, parts.size());
+    }
+
+    public Update getAction() {
+        return action;
+    }
+
+    public List<String> getArgs() {
+        return args;
     }
 }

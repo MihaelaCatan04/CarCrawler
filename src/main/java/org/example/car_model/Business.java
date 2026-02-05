@@ -1,8 +1,11 @@
 package org.example.car_model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public record Business(
         String plan,
         String id,
-        String __typename
+        @JsonProperty("__typename")
+        String typeName
 ) {
 }
