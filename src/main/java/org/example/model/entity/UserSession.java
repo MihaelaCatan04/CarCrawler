@@ -12,4 +12,19 @@ public class UserSession {
     public int maxMileage;
     public Step step = Step.BRAND;
     public CarOptions carOptions;
+
+    private long startTime;
+    private long endTime;
+
+    public void markStart() {
+        this.startTime = System.currentTimeMillis();
+    }
+
+    public void markEnd() {
+        this.endTime = System.currentTimeMillis();
+    }
+
+    public long getDurationMillis() {
+        return endTime - startTime;
+    }
 }

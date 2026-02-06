@@ -26,6 +26,8 @@ public class CarFlowHandler {
     }
 
     public void start(long chatId) {
+        UserSession s = getSessions().get(chatId);
+        s.markStart();
         getMessages().send(chatId, "Select a Brand:", getKeyboard().brands());
     }
 

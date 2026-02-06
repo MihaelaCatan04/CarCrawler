@@ -8,6 +8,8 @@ import org.example.service.report.CarReportService;
 import org.example.service.search.SearchService;
 import org.example.service.statistics.CarStatisticsCalculator;
 import org.example.telegram.message.MessageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -42,6 +44,7 @@ public enum Step {
     MAX_MILEAGE {
         @Override
         public void processStep(UserSession s, long chatId, String text, MessageService messageService) throws IOException, InterruptedException {
+            Logger logger = LoggerFactory.getLogger(Step.class);
             s.maxMileage = Integer.parseInt(text);
             SearchService searchService = new SearchService();
             StringCarParser parser = new StringCarParser();
@@ -49,6 +52,8 @@ public enum Step {
             List<Advert> cars = parser.parse(body);
             CarStatistics result = new CarStatisticsCalculator().calculate(cars);
             messageService.sendText(chatId, CarReportService.generateReport(result));
+            s.markEnd();
+            logger.info("Time Elapsed: {}", s.getDurationMillis());
             s.step = Step.BRAND;
         }
     };

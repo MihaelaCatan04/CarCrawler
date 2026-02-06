@@ -12,6 +12,9 @@ import org.example.model.dto.response.Option;
 import org.example.model.entity.CarOptions;
 import org.example.model.entity.GenerationOption;
 import org.example.model.entity.ModelOption;
+import org.example.telegram.message.MessageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -44,6 +47,7 @@ public class CarOptionsService {
 
     private final ObjectMapper mapper = new ObjectMapper();
     private final HttpService httpService;
+    private static final Logger logger = LoggerFactory.getLogger(MessageService.class);
 
     public CarOptionsService() {
         this.httpService = new HttpService();
@@ -58,7 +62,6 @@ public class CarOptionsService {
 
         GraphQLRequest requestBody = buildRequest(brandId);
         String responseBody = httpService.postJson(GRAPHQL_ENDPOINT, requestBody);
-        System.out.println(responseBody);
 
         GraphQLResponse graphQLResponse =
                 mapper.readValue(responseBody, GraphQLResponse.class);
@@ -81,11 +84,16 @@ public class CarOptionsService {
         }
 
         List<Option> models = data.feature().options();
+        logger.info("Found {} models", models.size());
+        logger.info(models.toString());
         if (models == null) {
             return result;
         }
 
         for (Option modelOption : models) {
+            if (modelOption.feature().options().isEmpty()) {
+                continue;
+            }
             int modelId = modelOption.id();
             String modelTitle = modelOption.title().translated();
 
@@ -93,7 +101,6 @@ public class CarOptionsService {
 
             Feature generationFeature = modelOption.feature();
             if (generationFeature != null && generationFeature.options() != null) {
-
                 for (Option genOption : generationFeature.options()) {
                     model.addGeneration(
                             new GenerationOption(

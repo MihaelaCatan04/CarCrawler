@@ -36,7 +36,7 @@ public class Main {
             Thread.currentThread().join();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 }
