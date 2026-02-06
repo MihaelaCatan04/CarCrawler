@@ -75,6 +75,7 @@ BOT_USERNAME =
 
 ### Elapsed Time
 For the default configuration, the elapsed time for scraping and filtering the cars is:
+<img width="676" height="50" alt="Screenshot From 2026-02-06 15-07-10" src="https://github.com/user-attachments/assets/a8155049-21d3-46cc-b4b4-e3e452fa47d1" />
 
 ------------------------------------------------------------------------
 
@@ -90,5 +91,5 @@ For the default configuration, the elapsed time for scraping and filtering the c
 
 -   **Website structure dependency**\
     HTML parsing relies on the current structure of 999.md. Changes to
-    the page may require updates to selectors or parsing logic.
+    the page script may require updates to selectors or parsing logic.
 
