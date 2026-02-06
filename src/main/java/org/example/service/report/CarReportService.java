@@ -1,0 +1,25 @@
+package org.example.service.report;
+
+import org.example.model.entity.CarStatistics;
+
+public class CarReportService {
+    public static String generateReport(CarStatistics stats) {
+        if (stats.lowestPriceLink() == null || stats.lowestPriceLink().isBlank()) {
+            return "No cars available for sale with these specifications.";
+        }
+
+        return """
+                Lowest price: %s €
+                Lowest link: %s
+                Highest price: %s €
+                Highest link: %s
+                Average price: %s €
+                """.formatted(
+                stats.lowestPrice(),
+                stats.lowestPriceLink(),
+                stats.highestPrice(),
+                stats.highestPriceLink(),
+                stats.averagePrice()
+        );
+    }
+}

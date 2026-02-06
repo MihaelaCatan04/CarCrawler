@@ -1,64 +1,95 @@
 # Car Scraper and Analyzer
 
-This Java project scrapes car listings from [999.md](https://999.md/ro), processes the data, writes it to a CSV file, filters cars based on specific criteria, and calculates basic statistics (lowest price, highest price, average price). The project uses Selenium for web scraping, Apache Commons CSV for CSV handling, and dotenv for configuration.
+This Java project extracts and analyzes car data from
+https://999.md/ro.\
+The application uses **HTTP requests**, **HTML parsing**, and **GraphQL
+queries** to dynamically retrieve available cars, models, and
+generations, and integrates with a **Telegram bot** for interaction.
+
+Instead of browser automation or CSV storage, the program processes data
+directly in memory and returns filtered results with calculated price
+statistics.
+
+------------------------------------------------------------------------
 
 ## Features
 
-- Scrape car listings from 999.md
-- Extract car details: Name, Model, Generation, Year, Mileage, Price, and Link
-- Convert prices to Euro (supports MDL and USD)
-- Save scraped data to CSV
-- Load CSV and filter cars based on environment variables (`CAR`, `MODEL`, `GENERATION`, `YEAR_MIN`, `YEAR_MAX`, `MIN_MILEAGE`, `MAX_MILEAGE`)
-- Calculate basic statistics: lowest price, highest price, average price
+-   Fetch available **car brands** using HTTP requests and HTML parsing
+-   Retrieve **models and generations** dynamically through GraphQL
+-   Integrate with a Telegram bot for selecting filters
+-   Extract car details:
+  -   Name
+  -   Model
+  -   Generation
+  -   Year
+  -   Mileage
+  -   Price
+  -   Listing Link
+-   Convert prices to Euro (supports MDL and USD)
+-   Filter cars based on configuration
+-   Calculate statistics:
+  -   Lowest price
+  -   Highest price
+  -   Average price
+
+------------------------------------------------------------------------
+
+## How It Works
+
+1.  The program sends an HTTP request to 999.md and parses the HTML to
+    extract available car brands.
+2.  After selecting a car, a GraphQL request retrieves all available
+    models and generations.
+3.  The Telegram bot displays selection options using inline keyboards.
+4.  Listings are processed in memory and filtered according to
+    configuration.
+5.  The program calculates and outputs price statistics.
+
+------------------------------------------------------------------------
 
 ## Getting Started
 
 ### Prerequisites
 
-- Java 17+
-- Maven or Gradle for dependencies
-- Chrome browser installed
-- ChromeDriver compatible with your Chrome version
-- `.env` file with the following variables:
+-   Java 17+
+-   Maven or Gradle
+-   Telegram Bot Token
+-   `.env` file with configuration:
 
 ```
-CAR=RENAULT
-MODEL=MEGANE
-GENERATION=III (2008 - 2016)
-YEAR_MIN=2015
-YEAR_MAX=2016
-MIN_MILEAGE=200000
-MAX_MILEAGE=300000
+BOT_TOKEN =
+CREATOR_ID =
+BOT_USERNAME =
 ```
+------------------------------------------------------------------------
 
-### Running the Program
+## Example Output
 
-The program will scrape car listings, save the data to `cars_data.csv`, filter cars according to the `.env` configuration, and print statistics:
+    Lowest price: 5000€
+    Lowest link: https://999.md/ro/...
+    Highest price: 20000€
+    Highest link: https://999.md/ro/...
+    Average price: 12000€
 
-```
-Lowest price: 5000€
-Lowest link: https://999.md/ro/...
-Highest price: 20000€
-Highest link: https://999.md/ro/...
-Average price: 12000€
-```
----
+------------------------------------------------------------------------
 
 ### Elapsed Time
 For the default configuration, the elapsed time for scraping and filtering the cars is:
-![img_1.png](img_1.png)
+<img width="676" height="50" alt="Screenshot From 2026-02-06 15-07-10" src="https://github.com/user-attachments/assets/a8155049-21d3-46cc-b4b4-e3e452fa47d1" />
+
+------------------------------------------------------------------------
 
 ## Limitations
 
-- **Website changes break your scraper**:  
-  The scraper relies on hardcoded XPaths and CSS selectors. If 999.md changes its DOM structure (element classes, IDs, hierarchy), scraping will fail.
+-   **Fixed currency conversion rates**\
+    MDL→EUR and USD→EUR conversions use static rates and are not updated
+    in real time.
 
-- **CSV memory usage**:  
-  Reading the entire CSV into memory using `readFile()` works for small datasets but may fail or be inefficient for very large datasets (tens of thousands of cars).
+-   **Telegram inline keyboard limit**\
+    The Telegram bot cannot display all 124 available car brands at
+    once, so only the first 100 are shown.
 
-- **Parsing limited to Romanian pages**:  
-  The scraping and parsing logic is designed specifically for the Romanian version of 999.md. It may not work correctly for pages in other languages or formats.
+-   **Website structure dependency**\
+    HTML parsing relies on the current structure of 999.md. Changes to
+    the page script may require updates to selectors or parsing logic.
 
-- **Sequential scraping**:  
-  The current implementation scrapes car pages one by one. This can be slow for large numbers of cars.
----
