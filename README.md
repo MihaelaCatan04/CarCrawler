@@ -57,7 +57,9 @@ statistics.
 -   `.env` file with configuration:
 
 ```
-
+BOT_TOKEN =
+CREATOR_ID =
+BOT_USERNAME =
 ```
 ------------------------------------------------------------------------
 
